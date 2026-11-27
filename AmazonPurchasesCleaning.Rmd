@@ -1,0 +1,35 @@
+---
+title: "Group4datacleaning"
+output: github_document
+date: "2026-11-27"
+---
+
+## Loading data
+```{r}
+purchases <- read.csv("~/Downloads/dataverse_files (1)/amazon-purchases.csv")
+users     <- read.csv("~/Downloads/dataverse_files (1)/survey.csv")
+
+head(purchases)
+str(purchases)
+head(users)
+str(users)
+```
+
+## Removing unusable rows and checking for duplicates
+```{r}
+n_before <- nrow(purchases)
+purchases <- purchases[!is.na(purchases$Order.Date) & !is.na(purchases$Survey.ResponseID) &
+                       purchases$Purchase.Price.Per.Unit >= 0 & purchases$Quantity > 0,]
+cat("Purchase rows removed:", n_before - nrow(purchases), "\n")
+
+cat("Duplicate user rows:", sum(duplicated(users)), "\n")
+```
+
+## Merging data
+```{r}
+merged <- merge(purchases, users, by = "Survey.ResponseID", all.x = TRUE,
+                suffixes = c("_purchase", "_user"))
+
+head(merged)
+str(merged)
+```
